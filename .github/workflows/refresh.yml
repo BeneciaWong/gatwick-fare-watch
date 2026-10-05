@@ -1,0 +1,12 @@
+name: refresh-prices
+on:
+  schedule: [{ cron: '0 */6 * * *' }]   # every 6 hours
+  workflow_dispatch:
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          H="x-refresh-secret: ${{ secrets.REFRESH_SECRET }}"; U="${{ secrets.SITE_URL }}/api/refresh"
+          curl -fsS -H "$H" "$U"
+          for i in 1 2 3; do sleep 600; curl -fsS -H "$H" "$U?collect=1"; done
